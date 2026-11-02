@@ -4,9 +4,9 @@ from enum import Enum
 
 
 class ImageScale(Enum):
-    """画像および映像スケールの定義."""
+    """Definitions of image and video scales."""
 
-    # 300dpi 基準 (メディアケース)
+    # 300 DPI reference (media cases)
     DVD_AMARAY_FULL = "dvd_amaray_full"
     DVD_AMARAY_SINGLE = "dvd_amaray_single"
     BD_AMARAY_FULL = "bd_amaray_full"
@@ -22,7 +22,7 @@ class ImageScale(Enum):
     LP_JACKET = "lp_jacket"
     SINGLE_RECORD_JACKET = "single_record_jacket"
 
-    # DPI（72DPI）
+    # 72 DPI
     DVD_AMARAY_FULL_72DPI = "dvd_amaray_full_72dpi"
     DVD_AMARAY_SINGLE_72DPI = "dvd_amaray_single_72dpi"
     BD_AMARAY_FULL_72DPI = "bd_amaray_full_72dpi"
@@ -38,7 +38,7 @@ class ImageScale(Enum):
     LP_JACKET_72DPI = "lp_jacket_72dpi"
     SINGLE_RECORD_JACKET_72DPI = "single_record_jacket_72dpi"
 
-    # DPI（96DPI）
+    # 96 DPI
     DVD_AMARAY_FULL_96DPI = "dvd_amaray_full_96dpi"
     DVD_AMARAY_SINGLE_96DPI = "dvd_amaray_single_96dpi"
     BD_AMARAY_FULL_96DPI = "bd_amaray_full_96dpi"
@@ -54,7 +54,7 @@ class ImageScale(Enum):
     LP_JACKET_96DPI = "lp_jacket_96dpi"
     SINGLE_RECORD_JACKET_96DPI = "single_record_jacket_96dpi"
 
-    # DPI（150DPI）
+    # 150 DPI
     DVD_AMARAY_FULL_150DPI = "dvd_amaray_full_150dpi"
     DVD_AMARAY_SINGLE_150DPI = "dvd_amaray_single_150dpi"
     BD_AMARAY_FULL_150DPI = "bd_amaray_full_150dpi"
@@ -70,7 +70,7 @@ class ImageScale(Enum):
     LP_JACKET_150DPI = "lp_jacket_150dpi"
     SINGLE_RECORD_JACKET_150DPI = "single_record_jacket_150dpi"
 
-    # DPI（200DPI）
+    # 200 DPI
     DVD_AMARAY_FULL_200DPI = "dvd_amaray_full_200dpi"
     DVD_AMARAY_SINGLE_200DPI = "dvd_amaray_single_200dpi"
     BD_AMARAY_FULL_200DPI = "bd_amaray_full_200dpi"
@@ -86,7 +86,7 @@ class ImageScale(Enum):
     LP_JACKET_200DPI = "lp_jacket_200dpi"
     SINGLE_RECORD_JACKET_200DPI = "single_record_jacket_200dpi"
 
-    # STD（固定名）
+    # STD (fixed size)
     DVD_AMARAY_FULL_STD = "dvd_amaray_full_std"
     DVD_AMARAY_SINGLE_STD = "dvd_amaray_single_std"
     BD_AMARAY_FULL_STD = "bd_amaray_full_std"
@@ -102,11 +102,11 @@ class ImageScale(Enum):
     LP_JACKET_STD = "lp_jacket_std"
     SINGLE_RECORD_JACKET_STD = "single_record_jacket_std"
 
-    # 映像解像度
+    # Video resolutions
     VIDEO_VGA = "video_vga"  # 640 x 480 (4:3)
     VIDEO_SD_NTSC = "video_sd_ntsc"  # 720 x 480 (4:3 / 16:9)
     VIDEO_HD = "video_hd"  # 1280 x 720 (16:9)
-    VIDEO_1440X1080 = "video_1440_1080"  # 1440 x 1080 (4:3 / HDV等)
+    VIDEO_1440X1080 = "video_1440_1080"  # 1440 x 1080 (4:3 / e.g. HDV)
     VIDEO_FHD = "video_fhd"  # 1920 x 1080 (16:9)
     VIDEO_WQHD = "video_wqhd"  # 2560 x 1440 (16:9)
     VIDEO_UWQHD = "video_uwqhd"  # 3440 x 1440 (21:9)
@@ -115,7 +115,7 @@ class ImageScale(Enum):
 
 
 # ==========================================
-# ピクセル数定義（すべて静的に記述）
+# Pixel dimensions (all statically defined)
 # ==========================================
 IMAGE_SCALE_PIXELS = {
     ImageScale.DVD_AMARAY_FULL: (3240, 2160),
@@ -207,7 +207,7 @@ IMAGE_SCALE_PIXELS = {
     ImageScale.VHD_JACKET_STD: (1280, 1232),
     ImageScale.LP_JACKET_STD: (1536, 1536),
     ImageScale.SINGLE_RECORD_JACKET_STD: (832, 832),
-    # 映像
+    # Video
     ImageScale.VIDEO_VGA: (640, 480),
     ImageScale.VIDEO_SD_NTSC: (720, 480),
     ImageScale.VIDEO_HD: (1280, 720),

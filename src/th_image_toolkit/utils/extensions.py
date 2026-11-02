@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-ImageMagick が扱える拡張子の定義モジュール。
-他の処理（validator, ops, GUI, CLI）から参照される。
-"""
+"""File extensions supported by ImageMagick and used across the package."""
 
-# 一般的なラスター画像
+# Common raster formats.
 RASTER_EXTENSIONS = {
     ".jpg",
     ".jpeg",
@@ -20,7 +17,7 @@ RASTER_EXTENSIONS = {
     ".heif",
 }
 
-# RAW画像（必要なら使う）
+# Camera RAW formats.
 RAW_EXTENSIONS = {
     ".cr2",
     ".cr3",
@@ -31,7 +28,7 @@ RAW_EXTENSIONS = {
     ".rw2",
 }
 
-# ベクター画像
+# Vector formats.
 VECTOR_EXTENSIONS = {
     ".svg",
     ".pdf",
@@ -39,5 +36,5 @@ VECTOR_EXTENSIONS = {
     ".ps",
 }
 
-# ImageMagick が扱える拡張子の統合セット
+# All supported extensions.
 SUPPORTED_EXTENSIONS = RASTER_EXTENSIONS | RAW_EXTENSIONS | VECTOR_EXTENSIONS

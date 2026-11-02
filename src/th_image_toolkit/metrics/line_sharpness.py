@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""アニメイラストや印刷原画の線画部分（エッジ成分）に特化した
-シャープネスおよびディテール密度を算出するモジュール。
-"""
+"""Measure sharpness and detail in line art."""
 
 import logging
 from pathlib import Path
@@ -14,9 +12,13 @@ logger = logging.getLogger(__name__)
 
 
 def compute_line_art_sharpness(image_path: Path) -> float | None:
-    """アニメパッケージや印刷原画の線画（輪郭）の鮮明度を評価する。
-    ソベルフィルタを用いてエッジの強度の平均値を算出し、
-    線がどれだけシャープに保たれているかを数値化する（日本語パス対応）。
+    """Measure line-art sharpness using the mean Sobel edge magnitude.
+
+    Args:
+        image_path: Path to the image.
+
+    Returns:
+        Mean edge magnitude, or None if the image cannot be processed.
     """
     if not image_path.exists():
         logger.error(f"File not found: {image_path}")
@@ -33,14 +35,14 @@ def compute_line_art_sharpness(image_path: Path) -> float | None:
             )
             return None
 
-        # ソベルフィルタでX方向・Y方向のエッジ勾配を計算
+        # Compute horizontal and vertical edge gradients.
         sobelx = cv2.Sobel(img_gray, cv2.CV_64F, 1, 0, ksize=3)
         sobely = cv2.Sobel(img_gray, cv2.CV_64F, 0, 1, ksize=3)
 
-        # エッジの強度（大きさと方向の合成）を算出
+        # Combine gradient magnitudes.
         edge_magnitude = np.sqrt(sobelx**2 + sobely**2)
 
-        # エッジ強度の平均値をアニメイラストのシャープネス指標とする
+        # Use the mean edge magnitude as the sharpness score.
         score = float(np.mean(edge_magnitude))
         return score
 

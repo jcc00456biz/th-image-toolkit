@@ -6,7 +6,7 @@ from pathlib import Path
 from PIL import ExifTags, Image
 from PIL.PngImagePlugin import PngInfo
 
-# 内部でのみ使用する、フォーマットごとの物理タグ名マッピング
+# Internal mappings from common fields to format-specific tags.
 _JPEG_TAG_MAP = {
     "title": "ImageDescription",
     "maker": "Artist",
@@ -30,7 +30,7 @@ _PNG_TAG_MAP = {
 
 @dataclass(slots=True)
 class ImageMetadata:
-    """パッケージ利用者がフォーマットを意識せず扱うための共通メタデータクラス。"""
+    """Common image metadata independent of file format."""
 
     title: str = ""
     maker: str = ""
@@ -41,7 +41,11 @@ class ImageMetadata:
     user_define: str = ""
 
     def to_jpeg_dict(self) -> dict[str, str]:
-        """共通メタデータを JPEG用の物理タグ名辞書に翻訳する[cite: 10]。"""
+        """Map common metadata fields to JPEG tag names.
+
+        Returns:
+            Metadata keyed by JPEG tag names.
+        """
         result: dict[str, str] = {}
         for field_name, jpeg_tag_name in _JPEG_TAG_MAP.items():
             val = getattr(self, field_name, "")
@@ -51,7 +55,14 @@ class ImageMetadata:
 
     @classmethod
     def from_jpeg_dict(cls, raw_tags: dict[str, str]) -> "ImageMetadata":
-        """文字列キー・値の辞書から共通の ImageMetadata を生成する[cite: 10]。"""
+        """Create metadata from a dictionary of JPEG tags.
+
+        Args:
+            raw_tags: Metadata keyed by JPEG tag names.
+
+        Returns:
+            Parsed image metadata.
+        """
         extracted_data: dict[str, str] = {}
         reverse_map = {v: k for k, v in _JPEG_TAG_MAP.items()}
 
@@ -65,7 +76,11 @@ class ImageMetadata:
         return cls(**extracted_data)
 
     def to_png_dict(self) -> dict[str, str]:
-        """共通メタデータを PNG用のテキストチャンク辞書に翻訳する[cite: 10]。"""
+        """Map common metadata fields to PNG text keys.
+
+        Returns:
+            Metadata keyed by PNG text names.
+        """
         result: dict[str, str] = {}
         for field_name, png_key in _PNG_TAG_MAP.items():
             val = getattr(self, field_name, "")
@@ -75,7 +90,14 @@ class ImageMetadata:
 
     @classmethod
     def from_png_dict(cls, raw_tags: dict[str, str]) -> "ImageMetadata":
-        """文字列キー・値の辞書から共通の ImageMetadata を生成する。"""
+        """Create metadata from a dictionary of PNG text keys.
+
+        Args:
+            raw_tags: Metadata keyed by PNG text names.
+
+        Returns:
+            Parsed image metadata.
+        """
         extracted_data: dict[str, str] = {}
         reverse_map = {v: k for k, v in _PNG_TAG_MAP.items()}
 
@@ -90,7 +112,17 @@ class ImageMetadata:
 
 
 def get_image_metadata(image_path: str | Path) -> ImageMetadata:
-    """画像ファイルからメタ情報を抽出し、共通された ImageMetadata で返却する。"""
+    """Extract metadata from an image into a common object.
+
+    Args:
+        image_path: Path to the image file.
+
+    Returns:
+        Extracted metadata, or empty metadata if no supported tags are found.
+
+    Raises:
+        OSError: If the image cannot be opened.
+    """
     path = Path(image_path)
 
     with Image.open(path) as img:
@@ -131,7 +163,19 @@ def set_image_metadata(
     metadata: ImageMetadata,
     output_path: str | Path | None = None,
 ) -> Path:
-    """共通の ImageMetadata を使用して、画像にメタ情報を設定して保存する。"""
+    """Write common metadata to an image and save it.
+
+    Args:
+        image_path: Path to the source image.
+        metadata: Metadata to write.
+        output_path: Optional destination path; defaults to image_path.
+
+    Returns:
+        Path to the saved image.
+
+    Raises:
+        OSError: If the image cannot be read or saved.
+    """
     path = Path(image_path)
     dest_path = Path(output_path) if output_path else path
 
@@ -179,7 +223,18 @@ def strip_image_metadata(
     image_path: str | Path,
     output_path: str | Path | None = None,
 ) -> Path:
-    """画像ファイルからすべてのメタ情報を削除して保存する[cite: 10]。"""
+    """Remove all metadata from an image and save it.
+
+    Args:
+        image_path: Path to the source image.
+        output_path: Optional destination path; defaults to image_path.
+
+    Returns:
+        Path to the saved image.
+
+    Raises:
+        OSError: If the image cannot be read or saved.
+    """
     path = Path(image_path)
     dest_path = Path(output_path) if output_path else path
 
@@ -194,7 +249,19 @@ def overwrite_image_metadata(
     metadata: ImageMetadata,
     output_path: str | Path | None = None,
 ) -> Path:
-    """既存の静的メタ情報をすべて削除し、指定した ImageMetadata のみを設定して保存する[cite: 10]。"""
+    """Replace existing metadata with the supplied metadata.
+
+    Args:
+        image_path: Path to the source image.
+        metadata: Metadata to write after removing existing metadata.
+        output_path: Optional destination path; defaults to image_path.
+
+    Returns:
+        Path to the saved image.
+
+    Raises:
+        OSError: If the image cannot be read or saved.
+    """
     path = Path(image_path)
     dest_path = Path(output_path) if output_path else path
 

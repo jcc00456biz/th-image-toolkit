@@ -4,7 +4,7 @@ setlocal
 echo [INFO] Activating .venv...
 call .\.venv\Scripts\activate
 
-echo [INFO] Installing packages from requirements.txt...
-pip install -r requirements.txt
+echo [INFO] Installing the package and test dependencies...
+python -m pip install -e ".[test]"
 
 echo [INFO] Completed.

@@ -24,11 +24,15 @@ def convert_image_format(
     dest_path: Path,
     output_format: OutputFormat = OutputFormat.JPEG,
 ) -> bool:
-    """
-    指定された画像ファイルを入力形式に問わず、
-    指定された OutputFormat (JPEG / PNG) に変換し、
-    最適化パラメータ（ハフマン最適化や圧縮フィルタ等）を適用して
-    dest_path へ保存する。
+    """Convert an image to the requested format.
+
+    Args:
+        src_path: Path to the source image.
+        dest_path: Path for the converted image.
+        output_format: Output format, either JPEG or PNG.
+
+    Returns:
+        True if conversion succeeds; otherwise, False.
     """
     if not src_path.exists():
         logger.error(f"Source image not found: {src_path}")
@@ -38,10 +42,10 @@ def convert_image_format(
         logger.error(f"Unsupported input extension: {src_path.suffix}")
         return False
 
-    # 出力先ディレクトリの確実な作成
+    # Ensure the destination directory exists.
     dest_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # コマンドパラメータの組み立て
+    # Build the command arguments.
     cmd_args = [str(src_path)] + list(IM_COMMON_PARAMS)
 
     if output_format is OutputFormat.JPEG:

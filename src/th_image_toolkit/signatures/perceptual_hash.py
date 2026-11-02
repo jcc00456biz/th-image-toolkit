@@ -11,13 +11,20 @@ logger = logging.getLogger(__name__)
 
 
 def compute_phash(image_path: Path) -> str | None:
-    """指定画像のパーセプトアルハッシュ（pHash）を求める（日本語パス対応）。"""
+    """Compute an image's perceptual hash.
+
+    Args:
+        image_path: Path to the image.
+
+    Returns:
+        The hexadecimal pHash string, or None if processing fails.
+    """
     if not image_path.exists():
         logger.error(f"File not found: {image_path}")
         return None
 
     try:
-        # バイナリとして読み込んでからメモリ上の画像として開く（Windowsの日本語パス対策）
+        # Read bytes first to support paths with non-ASCII characters.
         with open(image_path, "rb") as f:
             image_bytes = f.read()
 

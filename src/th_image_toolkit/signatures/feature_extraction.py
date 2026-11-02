@@ -9,13 +9,20 @@ logger = logging.getLogger(__name__)
 
 
 def _load_gray(image_path: Path):
-    """例外を投げずにグレースケール画像を読み込む（日本語パス対応）"""
+    """Load an image as grayscale.
+
+    Args:
+        image_path: Path to the image.
+
+    Returns:
+        A grayscale image array, or None if loading fails.
+    """
     if not image_path.exists():
         logger.error(f"File not found: {image_path}")
         return None
 
     try:
-        # バイナリとして安全に読み込んでからデコードする（日本語パス対策）
+        # Decode bytes to support paths with non-ASCII characters.
         with open(image_path, "rb") as f:
             chunk = np.frombuffer(f.read(), dtype=np.uint8)
         img = cv2.imdecode(chunk, cv2.IMREAD_GRAYSCALE)
@@ -30,7 +37,14 @@ def _load_gray(image_path: Path):
 
 
 def compute_orb(image_path: Path):
-    """ORB 特徴点抽出。例外は投げず None を返す。"""
+    """Extract ORB keypoints and descriptors.
+
+    Args:
+        image_path: Path to the image.
+
+    Returns:
+        A (keypoints, descriptors) pair, or None if extraction fails.
+    """
     img = _load_gray(image_path)
     if img is None:
         return None
@@ -51,7 +65,14 @@ def compute_orb(image_path: Path):
 
 
 def compute_sift(image_path: Path):
-    """SIFT 特徴点抽出。例外は投げず None を返す。"""
+    """Extract SIFT keypoints and descriptors.
+
+    Args:
+        image_path: Path to the image.
+
+    Returns:
+        A (keypoints, descriptors) pair, or None if extraction fails.
+    """
     img = _load_gray(image_path)
     if img is None:
         return None
@@ -72,7 +93,14 @@ def compute_sift(image_path: Path):
 
 
 def compute_akaze(image_path: Path):
-    """AKAZE 特徴点抽出。例外は投げず None を返す。"""
+    """Extract AKAZE keypoints and descriptors.
+
+    Args:
+        image_path: Path to the image.
+
+    Returns:
+        A (keypoints, descriptors) pair, or None if extraction fails.
+    """
     img = _load_gray(image_path)
     if img is None:
         return None

@@ -8,8 +8,14 @@ logger = logging.getLogger(__name__)
 
 
 def match_orb(desc1: Any, desc2: Any):
-    """ORB の特徴量を BFMatcher(Hamming) でマッチングする。
-    例外は投げず、失敗時は None を返す。
+    """Match ORB descriptors using BFMatcher (Hamming).
+
+    Args:
+        desc1: Descriptor array from the first image.
+        desc2: Descriptor array from the second image.
+
+    Returns:
+        Distance-sorted matches, or None if matching fails.
     """
     if desc1 is None or desc2 is None:
         logger.error("ORB descriptors are None")
@@ -27,8 +33,14 @@ def match_orb(desc1: Any, desc2: Any):
 
 
 def match_flann(desc1: Any, desc2: Any):
-    """SIFT / AKAZE の特徴量を FLANN(KD-tree) でマッチングする。
-    例外は投げず、失敗時は None を返す。
+    """Match SIFT / AKAZE descriptors using FLANN (KD-tree).
+
+    Args:
+        desc1: Descriptor array from the first image.
+        desc2: Descriptor array from the second image.
+
+    Returns:
+        Matches that pass Lowe's ratio test, or None on failure.
     """
     if desc1 is None or desc2 is None:
         logger.error("FLANN descriptors are None")
@@ -42,7 +54,7 @@ def match_flann(desc1: Any, desc2: Any):
         )
         matches = flann.knnMatch(desc1, desc2, k=2)
 
-        # Lowe の ratio test
+        # Lowe's ratio test
         good = []
         for m, n in matches:
             if m.distance < 0.7 * n.distance:

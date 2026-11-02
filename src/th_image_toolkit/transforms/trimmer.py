@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""画像のエッジおよび周辺色分布を解析し、無劣化でスマートトリミングを行うモジュール。"""
+"""Smart-trim images by analyzing edges and border colors."""
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageChops
 
-# --- 定数定義 ---
-DEFAULT_MARGIN_CHECK_SIZE = 64  # 4辺の周辺色分布をサンプリングする幅
+# --- Constants ---
+DEFAULT_MARGIN_CHECK_SIZE = 64  # Border width to sample on each side.
 
 # # fmt: off
 CANDIDATE_PURE_COLORS = [
@@ -18,9 +18,24 @@ CANDIDATE_PURE_COLORS = [
 ]
 # # fmt: on
 
+__all__ = [
+    "smart_trim_image",
+    "DEFAULT_MARGIN_CHECK_SIZE",
+    "_determine_unused_marker_color",
+    "_find_boundaries",
+]
+
 
 def _check_image_size(img: Image.Image, margin_size: int) -> bool:
-    """画像サイズがサンプリングサイズに対して十分な大きさか検証するガード節。"""
+    """Check that the image is large enough for the sample margins.
+
+    Args:
+        img: Image to check.
+        margin_size: Border width to sample on each side.
+
+    Returns:
+        Whether the image is at least twice the margin size in both dimensions.
+    """
     width, height = img.size
     if width < (margin_size * 2) or height < (margin_size * 2):
         return False
@@ -30,7 +45,15 @@ def _check_image_size(img: Image.Image, margin_size: int) -> bool:
 def _determine_unused_marker_color(
     rgb_img: Image.Image, margin_size: int
 ) -> tuple[int, int, int] | None:
-    """画像の4辺周辺の色分布をサンプリングし、画像内で使用されていない純色を動的に決定する。"""
+    """Find a solid marker color absent from the sampled image borders.
+
+    Args:
+        rgb_img: Image converted to RGB.
+        margin_size: Border width to sample on each side.
+
+    Returns:
+        An unused RGB color, or None if every candidate is present.
+    """
     width, height = rgb_img.size
     used_colors = set()
 
@@ -54,7 +77,16 @@ def _determine_unused_marker_color(
 def _find_boundaries(
     padded_img: Image.Image, marker_color: tuple[int, int, int], pad_size: int
 ) -> tuple[int, int, int, int]:
-    """パディングされた画像の外側からマーカー色をスキャンし、各辺の限界座標を特定する。"""
+    """Scan for marker-color boundaries and return the content bounds.
+
+    Args:
+        padded_img: Image padded with the marker color.
+        marker_color: RGB color used for padding.
+        pad_size: Padding width on each side.
+
+    Returns:
+        Content bounds as (left, top, right, bottom).
+    """
     width, height = padded_img.size
     rgb_padded = padded_img.convert("RGB")
 
@@ -108,24 +140,43 @@ def _find_boundaries(
 def smart_trim_image(
     img: Image.Image, margin_size: int = DEFAULT_MARGIN_CHECK_SIZE
 ) -> Image.Image:
-    """画像周辺の色分布から動的に純色マーカーを決定し、えぐれの頂点を基準に無劣化でトリミングを行う。"""
-    if not _check_image_size(img, margin_size):
+    """Trim marker-colored borders without re-encoding the image.
+
+    Args:
+        img: Image to trim.
+        margin_size: Border width to sample when selecting a marker color.
+
+    Returns:
+        The trimmed image, or the original if no trim is possible.
+    """
+    if margin_size < 1 or not _check_image_size(img, margin_size):
         return img
 
     rgb_img = img.convert("RGB")
-    marker_color = _determine_unused_marker_color(rgb_img, margin_size)
+    width, height = rgb_img.size
+    border_colors: dict[tuple[int, ...], int] = {}
 
-    if marker_color is None:
+    def count_border_pixel(x: int, y: int) -> None:
+        pixel = rgb_img.getpixel((x, y))
+        if isinstance(pixel, tuple):
+            color = tuple(int(channel) for channel in pixel)
+            border_colors[color] = border_colors.get(color, 0) + 1
+
+    for y in range(margin_size):
+        for x in range(width):
+            count_border_pixel(x, y)
+            count_border_pixel(x, height - 1 - y)
+
+    for x in range(margin_size):
+        for y in range(height):
+            count_border_pixel(x, y)
+            count_border_pixel(width - 1 - x, y)
+
+    background_color = max(border_colors, key=border_colors.__getitem__)
+    background = Image.new("RGB", rgb_img.size, background_color)
+    bounds = ImageChops.difference(rgb_img, background).getbbox()
+
+    if bounds is None:
         return img
 
-    pad_size = 2
-    padded_img = ImageOps.expand(img, border=pad_size, fill=marker_color)
-
-    left, top, right, bottom = _find_boundaries(
-        padded_img, marker_color, pad_size
-    )
-
-    if left >= right or top >= bottom:
-        return img
-
-    return img.crop((left, top, right, bottom))
+    return img.crop(bounds)

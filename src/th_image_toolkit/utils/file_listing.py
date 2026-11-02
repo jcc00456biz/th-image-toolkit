@@ -20,11 +20,27 @@ class SortOrder(StrEnum):
 
 
 def _sort_by_name(p: Path) -> str:
+    """Return a lowercase filename sort key.
+
+    Args:
+        p: File path to sort.
+
+    Returns:
+        Lowercase filename.
+    """
     return p.name.lower()
 
 
 def _sort_by_mtime(p: Path) -> str:
-    # float → str に統一して型を揃える
+    # Return a string to keep the sort key type consistent.
+    """Return a file's modification time as a string sort key.
+
+    Args:
+        p: File path to sort.
+
+    Returns:
+        Modification time as a string.
+    """
     return str(p.stat().st_mtime)
 
 
@@ -34,11 +50,22 @@ def list_files(
     sort_key: SortKey = SortKey.NAME,
     sort_order: SortOrder = SortOrder.ASC,
 ) -> list[Path]:
-    """
-    指定ディレクトリ以下のサポートされている画像ファイル一覧を取得する。
-    デフォルトではサブディレクトリも対象にする。
-    ソートはファイル名 or 更新日時で昇順/降順を指定可能。
-    デフォルトはファイル名昇順。
+    """List supported images, optionally including subdirectories.
+
+    Sort by name or modification time in ascending or descending order.
+
+    Args:
+        root: Directory to search.
+        recursive: Whether to include nested directories.
+        sort_key: Field used to sort the results.
+        sort_order: Sort direction.
+
+    Returns:
+        Supported image paths in the requested order.
+
+    Raises:
+        FileNotFoundError: If root does not exist.
+        NotADirectoryError: If root is not a directory.
     """
 
     if not root.exists():
@@ -47,7 +74,7 @@ def list_files(
     if not root.is_dir():
         raise NotADirectoryError(f"Not a directory: {root}")
 
-    # ファイル一覧取得（ImageMagick サポート拡張子に絞り込む）
+    # Collect files with supported ImageMagick extensions.
     if recursive:
         files: Iterable[Path] = (
             p
@@ -63,7 +90,7 @@ def list_files(
 
     file_list = list(files)
 
-    # ソートキー選択（lambda 不使用）
+    # Select the sort key.
     if sort_key is SortKey.NAME:
         key_func = _sort_by_name
     else:

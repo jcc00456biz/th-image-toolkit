@@ -14,9 +14,19 @@ class ImageLevelError(Exception):
 
 
 def apply_auto_levels(src_path: Path, dest_path: Path) -> Path:
-    """
-    指定された画像ファイルに対して自動レベル補正 (-auto-level) を実行し、
-    指定された dest_path へ保存する。
+    """Apply automatic level correction and save the result.
+
+    Args:
+        src_path: Path to the source image.
+        dest_path: Path for the adjusted image.
+
+    Returns:
+        The destination path.
+
+    Raises:
+        FileNotFoundError: If the source image does not exist.
+        ValueError: If the source extension is unsupported.
+        ImageLevelError: If ImageMagick fails to process the image.
     """
     if not src_path.exists():
         logger.error(f"Source image not found: {src_path}")
@@ -26,7 +36,7 @@ def apply_auto_levels(src_path: Path, dest_path: Path) -> Path:
         logger.error(f"Unsupported input extension: {src_path.suffix}")
         raise ValueError(f"Unsupported input extension: {src_path.suffix}")
 
-    # 出力先ディレクトリの確実な作成
+    # Ensure the destination directory exists.
     dest_path.parent.mkdir(parents=True, exist_ok=True)
 
     cmd_args = [str(src_path)] + list(IM_COMMON_PARAMS)

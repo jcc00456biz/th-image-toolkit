@@ -26,10 +26,24 @@ def resize_and_sharpen(
     dest_path: Path,
     auto_level: bool = False,
 ) -> Path:
-    """
-    指定されたサイズへのリサイズ、および自動レベル補正を行う。
-    リサイズ元の画像サイズを取得し、拡大方向（目標サイズが元サイズより大きい）の
-    場合のみアンシャープマスクを適用して指定された dest_path へ保存する。
+    """Resize an image and optionally apply auto-level correction.
+
+    Apply an unsharp mask only when enlarging, then save to dest_path.
+
+    Args:
+        src_path: Path to the source image.
+        target_width: Output width in pixels.
+        target_height: Output height in pixels.
+        dest_path: Path for the resized image.
+        auto_level: Whether to apply automatic level correction.
+
+    Returns:
+        The destination path.
+
+    Raises:
+        FileNotFoundError: If the source image does not exist.
+        ValueError: If the source extension is unsupported.
+        ImageResizeError: If the source cannot be read or processing fails.
     """
     if not src_path.exists():
         logger.error(f"Source image not found: {src_path}")
@@ -39,7 +53,7 @@ def resize_and_sharpen(
         logger.error(f"Unsupported input extension: {src_path.suffix}")
         raise ValueError(f"Unsupported input extension: {src_path.suffix}")
 
-    # PIL を用いて元画像のサイズを取得し、拡大かどうかを判定
+    # Read the source dimensions to determine whether this is an enlargement.
     try:
         with Image.open(src_path) as img:
             src_w, src_h = img.size
@@ -51,21 +65,21 @@ def resize_and_sharpen(
             f"Failed to read source image dimensions: {e}"
         ) from e
 
-    # 目標サイズのどちらかが元サイズを上回っている場合は拡大とみなす
+    # Treat either increased dimension as an enlargement.
     is_enlargement = (target_width > src_w) or (target_height > src_h)
 
-    # 出力先ディレクトリの確実な作成
+    # Ensure the destination directory exists.
     dest_path.parent.mkdir(parents=True, exist_ok=True)
 
     cmd_args = [str(src_path)] + list(IM_COMMON_PARAMS)
 
-    # 自動レベル補正が有効な場合、コマンド引数に追加
+    # Add auto-level correction when requested.
     if auto_level:
         cmd_args.append("-auto-level")
 
     cmd_args.extend(["-resize", f"{target_width}x{target_height}!"])
 
-    # 拡大時のみアンシャープパラメータを追加
+    # Sharpen only when enlarging.
     if is_enlargement:
         cmd_args.extend(list(IM_UNSHARP_PARAMS))
 

@@ -9,8 +9,13 @@ logger = logging.getLogger(__name__)
 
 
 def get_image_resolution(image_path: Path) -> tuple[int, int] | None:
-    """指定された画像ファイルの解像度（幅, 高さ）を取得する。
-    例外は投げず、失敗時は logger に出力して None を返す（日本語パス対応）。
+    """Get an image's dimensions.
+
+    Args:
+        image_path: Path to the image.
+
+    Returns:
+        A (width, height) pair, or None if the image cannot be read.
     """
     if not image_path.exists():
         logger.error(f"File not found: {image_path}")

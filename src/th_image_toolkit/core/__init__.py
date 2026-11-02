@@ -11,9 +11,12 @@ from .config import (
 from .runner import (
     MagickExecutionError,
     MagickNotFoundError,
+    TesseractExecutionError,
+    TesseractNotFoundError,
     run_magick,
+    run_tesseract,
 )
-from .scales import ImageScale
+from .scales import IMAGE_SCALE_PIXELS, ImageScale
 
 __all__ = [
     "ImageOrientation",
@@ -25,6 +28,10 @@ __all__ = [
     "OutputFormat",
     "MagickExecutionError",
     "MagickNotFoundError",
+    "TesseractExecutionError",
+    "TesseractNotFoundError",
     "run_magick",
+    "run_tesseract",
     "ImageScale",
+    "IMAGE_SCALE_PIXELS",
 ]

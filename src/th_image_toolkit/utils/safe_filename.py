@@ -4,7 +4,14 @@ from pathlib import Path
 
 
 def to_safe_win(text: str) -> str:
-    """Windows禁止記号および感嘆符を全角化します（括弧は処理しません）。"""
+    """Replace unsafe characters with Windows-safe equivalents.
+
+    Args:
+        text: Filename text to sanitize.
+
+    Returns:
+        Sanitized text.
+    """
     double_excl = chr(0x203C)
     var_selector = chr(0xFE0E)
 
@@ -41,27 +48,30 @@ def to_safe_win(text: str) -> str:
 
 
 def generate_safe_filename(target: Path) -> Path:
-    """
-    Windows 禁止文字を全角化し、拡張子を小文字化し、
-    さらに衝突する場合は Windows のように (1), (2)... を付与して
-    衝突しないファイル名を返す。
+    """Sanitize a filename and add a numeric suffix if it already exists.
+
+    Args:
+        target: Desired output path.
+
+    Returns:
+        A sanitized path that does not currently exist.
     """
 
     parent = target.parent
 
-    # 拡張子を小文字化
+    # Normalize the extension.
     suffix = target.suffix.lower()
 
-    # stem に Windows 禁止文字の安全化を適用
+    # Sanitize the filename stem.
     safe_stem = to_safe_win(target.stem)
 
     normalized = parent / f"{safe_stem}{suffix}"
 
-    # 衝突なしならそのまま返す
+    # Return the path if it is unused.
     if not normalized.exists():
         return normalized
 
-    # 衝突回避ループ
+    # Find an unused numbered path.
     index = 1
     while True:
         candidate = parent / f"{safe_stem}({index}){suffix}"

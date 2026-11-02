@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from enum import StrEnum
 import io
+from enum import StrEnum
 from pathlib import Path
+
 from PIL import Image, UnidentifiedImageError
 
 
@@ -15,16 +16,23 @@ class ImageOrientation(StrEnum):
 
 
 def get_image_orientation(image_path: Path) -> ImageOrientation:
-    """Return the ImageOrientation for the given image path.
+    """Classify an image as portrait, landscape, or square.
 
-    Classifies the image as portrait, landscape, or square.
-    Paths that contain non-ASCII characters (including Japanese) are supported.
+    Args:
+        image_path: Path to the image.
+
+    Returns:
+        The image's orientation.
+
+    Raises:
+        FileNotFoundError: If the path does not exist.
+        ValueError: If the image cannot be opened.
     """
     if not image_path.exists():
         raise FileNotFoundError(f"File not found: {image_path}")
 
     try:
-        # Read as binary, then open from memory (workaround for non-ASCII paths on Windows).
+        # Read as binary, then open from memory
         with open(image_path, "rb") as f:
             image_bytes = f.read()
 

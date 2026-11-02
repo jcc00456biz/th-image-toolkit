@@ -9,8 +9,15 @@ logger = logging.getLogger(__name__)
 
 
 def compute_image_sharpness(image_path: Path) -> float | None:
-    """ラプラシアン分散を用いて画像のシャープネス（鮮明度・ぼやけ度）を算出する（日本語パス対応）。
-    値が大きいほどシャープで、小さいほどボケている。
+    """Measure image sharpness using Laplacian variance.
+
+    Higher values indicate sharper images.
+
+    Args:
+        image_path: Path to the image.
+
+    Returns:
+        Laplacian variance, or None if the image cannot be processed.
     """
     if not image_path.exists():
         logger.error(f"File not found: {image_path}")
@@ -25,7 +32,7 @@ def compute_image_sharpness(image_path: Path) -> float | None:
             logger.error(f"Failed to load image for sharpness: {image_path}")
             return None
 
-        # ラプラシアン分散値の計算
+        # Calculate the Laplacian variance.
         laplacian_var = float(cv2.Laplacian(img_gray, cv2.CV_64F).var())
         return laplacian_var
 

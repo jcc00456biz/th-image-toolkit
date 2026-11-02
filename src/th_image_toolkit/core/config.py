@@ -8,30 +8,30 @@ class OutputFormat(StrEnum):
     PNG = "png"
 
 
-# 共通パラメータ（リサイズ・変換時に必ず付与）
+# Common parameters (always applied when resizing or converting)
 # fmt: off
 IM_COMMON_PARAMS: list[str] = [
-    "-strip",                   # メタデータ削除
-    "-colorspace",  "sRGB",     # 色空間統一
-    "-filter",      "Lanczos",  # 高品質リサイズ
-    "-density",     "96",       # Windows/Linux の標準 DPI
+    "-strip",                   # Remove metadata
+    "-colorspace",  "sRGB",     # Standardize the color space
+    "-filter",      "Lanczos",  # High-quality resizing
+    "-density",     "96",       # Standard DPI for Windows/Linux
 ]
 
-# JPEG 出力時に必ず付与するパラメータ
+# Parameters always applied when outputting JPEG
 IM_JPEG_PARAMS: list[str] = [
-    "-quality",     "100",                          # 量子化率100%
-    "-define",      "jpeg:optimize-coding=true",    # 最適化ハフマン
-    "-define",      "jpeg:dct-method=float",        # 高精度DCT
-    "-interlace",   "none",                         # ベースライン化（非プログレッシブ）
+    "-quality",     "100",                          # 100% quality
+    "-define",      "jpeg:optimize-coding=true",    # Optimized Huffman coding
+    "-define",      "jpeg:dct-method=float",        # High-precision DCT
+    "-interlace",   "none",                         # Baseline encoding
 ]
 
-# PNG 出力時に必ず付与するパラメータ（アーカイブ用途）
+# Parameters always applied when outputting PNG (for archival use)
 IM_PNG_PARAMS: list[str] = [
-    "-define",  "png:compression-level=9",      # 最大圧縮
-    "-define",  "png:compression-filter=5",     # 最適フィルタ
+    "-define",  "png:compression-level=9",      # Maximum compression
+    "-define",  "png:compression-filter=5",     # Optimal filter
 ]
 
-# アンシャープマスクの標準パラメータ
+# Default unsharp mask parameters
 IM_UNSHARP_PARAMS: list[str] = [
     "-unsharp", "12x6+0.5+0",
 ]

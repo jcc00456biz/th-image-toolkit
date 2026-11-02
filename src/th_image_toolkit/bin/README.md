@@ -7,6 +7,7 @@ This directory contains the portable build of **ImageMagick** used internally by
 bin/
 ├─ README.md                ← this file
 └─ ImageMagick/             ← portable ImageMagick distribution
+└─ Tesseract-OCR/           ← portable Tesseract-OCR distribution
 
 ## Version
 
